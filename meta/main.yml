@@ -1,0 +1,16 @@
+---
+galaxy_info:
+  author: Rongbing Miao
+  description: An Ansible role for installing PostgreSQL.
+  company: Boston Public Library
+  license: Apache
+  min_ansible_version: 2.5
+  platforms:
+  - name: Ubuntu
+    versions:
+    - trusty
+    - xenial
+    - bionic
+  categories:
+  - database:sql
+dependencies: []

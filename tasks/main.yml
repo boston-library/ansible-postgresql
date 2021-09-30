@@ -1,0 +1,46 @@
+---
+# - name: Configure the PostgreSQL APT key
+#   apt_key: url=https://www.postgresql.org/media/keys/ACCC4CF8.asc state=present
+# 
+# - name: Configure the PostgreSQL APT repositories
+#   apt_repository: repo="deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release}}-pgdg main"
+#                   state=present
+#
+# - name: Install PostgreSQL
+#   apt:
+#     state: present
+#     pkg: 
+#     - postgresql-{{ postgresql_version }}={{ postgresql_package_version }}
+#     - postgresql-server-dev-{{ postgresql_version }}={{ postgresql_package_version }}
+- debug: 
+    msg: "In miao-bpl, ansible-postgresql, installing postgresql and config pg_hba.conf"
+
+- name: Install PostgreSQL
+  apt:
+    name:
+      - postgresql
+      - postgresql-contrib
+    state: present
+  ignore_errors: True
+
+    
+- name: Configure PostgreSQL host-based authentication
+  template: src=pg_hba.conf.j2 dest=/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
+#  template: src=pg_hba.conf.j2 dest=/etc/postgresql/9.3/main/pg_hba.conf
+  notify:
+    - Restart PostgreSQL
+  ignore_errors: True
+
+- name: Configure PostgreSQL
+  template: src=postgresql.conf.j2 dest=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
+#  template: src=postgresql.conf.j2 dest=/etc/postgresql/9.3/main/postgresql.conf
+  notify:
+    - Restart PostgreSQL
+  ignore_errors: True
+
+## Because ansible 2.0.1 cannot resolve some variables, ubuntu14 cannot restart
+## postgresql service. Manually start it.  
+- name: Start postgresql service
+  become: yes
+  command: service postgresql restart
+
